@@ -80,11 +80,40 @@ public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		 * If you are not familiar with the use of regular expressions in
 		 * Java code, search the web for "Java Regex Tutorial." 
 		 */
+		int wordCount = 1;
+		String countryCode = "";
+		boolean isFemaleEducation = false;
+		
 		for (String word : line.split(",")) {
-			if (word.length() > 2) {
-				word = cleanWord(word);
-				if(word.length() == 3){
-					context.write(new Text(word), new IntWritable(1));
+			if(wordCount == 1) {
+				wordCount++;
+			}
+			else if(wordCount == 2) {
+				wordCount++;
+				if(word.length() > 3) {
+					if(word.charAt(0) == '\"') {
+						word = word.substring(1);
+					}
+					if(word.charAt(word.length()-1) == '\"') {
+						word = word.substring(0, word.length()-1);
+					}
+					countryCode = word;
+				}
+			}
+			else if(wordCount == 3) {
+				wordCount++;
+				if(word.toLowerCase().contains("educational") &&
+						word.contains("female") &&
+						!word.contains("at least")){
+					isFemaleEducation = true;
+				}
+			}
+			else {			
+				if (word.length() > 0) {
+					word = cleanWord(word);
+					if(word.length() == 3){
+						context.write(new Text(word), new IntWritable(1));
+					}
 				}
 			}
 		}
