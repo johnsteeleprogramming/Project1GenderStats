@@ -7,50 +7,85 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-/* 
- * To define a map function for your MapReduce job, subclass 
- * the Mapper class and override the map method.
- * The class definition requires four parameters: 
- *   The data type of the input key
- *   The data type of the input value
- *   The data type of the output key (which is the input key type 
- *   for the reducer)
- *   The data type of the output value (which is the input value 
- *   type for the reducer)
- */
-
 public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+	
+	private static String[] countryCodes = {"ABW", 
+		"AFG", "AGO", "ALB", "AND", "ARB", "ARE", "ARG", "ARM", "ASM", "ATG", 
+		"AUS", "AUT", "AZE", "BDI", "BEL", "BEN", "BFA", "BGD", "BGR", "BHR", 
+		"BHS", "BIH", "BLR", "BLZ", "BMU", "BOL", "BRA", "BRB", "BRN", "BTN", 
+		"BWA", "CAF", "CAN", "CEB", "CHE", "CHI", "CHL", "CHN", "CIV", "CMR", 
+		"COD", "COG", "COL", "COM", "CPV", "CRI", "CSS", "CUB", "CUW", "CYM", 
+		"CYP", "CZE", "DEU", "DJI", "DMA", "DNK", "DOM", "DZA", "EAP", "EAR", 
+		"EAS", "ECA", "ECS", "ECU", "EGY", "EMU", "ERI", "ESP", "EST", "ETH", 
+		"EUU", "FCS", "FIN", "FJI", "FRA", "FRO", "FSM", "GAB", "GBR", "GEO", 
+		"GHA", "GIB", "GIN", "GMB", "GNB", "GNQ", "GRC", "GRD", "GRL", "GTM", 
+		"GUM", "GUY", "HIC", "HKG", "HND", "HPC", "HRV", "HTI", "HUN", "IBD", 
+		"IBT", "IDA", "IDB", "IDN", "IDX", "IMN", "IND", "IRL", "IRN", "IRQ", 
+		"ISL", "ISR", "ITA", "JAM", "JOR", "JPN", "KAZ", "KEN", "KGZ", "KHM", 
+		"KIR", "KNA", "KOR", "KWT", "LAC", "LAO", "LBN", "LBR", "LBY", "LCA", 
+		"LCN", "LDC", "LIC", "LIE", "LKA", "LMC", "LMY", "LSO", "LTE", "LTU", 
+		"LUX", "LVA", "MAC", "MAF", "MAR", "MCO", "MDA", "MDG", "MDV", "MEA", 
+		"MEX", "MHL", "MIC", "MKD", "MLI", "MLT", "MMR", "MNA", "MNE", "MNG", 
+		"MNP", "MOZ", "MRT", "MUS", "MWI", "MYS", "NAC", "NAM", "NCL", "NER", 
+		"NGA", "NIC", "NLD", "NOR", "NPL", "NRU", "NZL", "OED", "OMN", "OSS", 
+		"PAK", "PAN", "PER", "PHL", "PLW", "PNG", "POL", "PRE", "PRI", "PRK", 
+		"PRT", "PRY", "PSE", "PSS", "PST", "PYF", "QAT", "ROU", "RUS", "RWA", 
+		"SAS", "SAU", "SDN", "SEN", "SGP", "SLB", "SLE", "SLV", "SMR", "SOM", 
+		"SRB", "SSA", "SSD", "SSF", "SST", "STP", "SUR", "SVK", "SVN", "SWE", 
+		"SWZ", "SXM", "SYC", "SYR", "TCA", "TCD", "TEA", "TEC", "TGO", "THA", 
+		"TJK", "TKM", "TLA", "TLS", "TMN", "TON", "TSA", "TSS", "TTO", "TUN", 
+		"TUR", "TUV", "TZA", "UGA", "UKR", "UMC", "URY", "USA", "UZB", "VCT", 
+		"VEN", "VGB", "VIR", "VNM", "VUT", "WLD", "WSM", "XKX", "YEM", "ZAF", 
+		"ZMB", "ZWE"};
+	
+	public static String[] getCountryCodes(){
+		return countryCodes;
+	}
+	
+	private static boolean isCountryCode(String code){
+		boolean doesContain = false;
+		
+		for(String countryCode: getCountryCodes()){
+			if(code.equals(countryCode)){
+				doesContain = true;
+			}
+		}
+		
+		return doesContain;
+	}
 
-	/*
-	 * The map method runs once for each line of text in the input file.
-	 * The method receives a key of type LongWritable, a value of type
-	 * Text, and a Context object.
-	 */
+	private String cleanWord(String word){
+		
+		while((word.toLowerCase().charAt(0) < 97 || 
+				word.toLowerCase().charAt(0) > 122) && 
+				word.length() > 2){
+			word = word.substring(1);
+		}		
+		
+		while((word.toLowerCase().charAt(word.length()-1) < 97 || 
+				word.toLowerCase().charAt(word.length()-1) > 122) && 
+				word.length() > 2){
+			word = word.substring(0, word.length()-1);
+		}
+		return word;
+	}
+	
 	@Override
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
 
-		/*
-		 * Convert the line, which is received as a Text object,
-		 * to a String object.
-		 */
 		String line = value.toString();
 
 		/*
-		 * The line.split("\\W+") call uses regular expressions to split the
-		 * line up by non-word characters.
-		 * 
 		 * If you are not familiar with the use of regular expressions in
 		 * Java code, search the web for "Java Regex Tutorial." 
 		 */
-		for (String word : line.split("\\W+")) {
-			if (word.length() > 0) {
-
-				/*
-				 * Call the write method on the Context object to emit a key
-				 * and a value from the map method.
-				 */
-				context.write(new Text(word), new IntWritable(1));
+		for (String word : line.split(",")) {
+			if (word.length() > 2) {
+				word = cleanWord(word);
+				if(word.length() == 3){
+					context.write(new Text(word), new IntWritable(1));
+				}
 			}
 		}
 	}
