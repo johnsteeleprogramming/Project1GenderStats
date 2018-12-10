@@ -2,13 +2,14 @@ package com.revature.map;
 
 import java.io.IOException;
 
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
-	
+
 	private static String[] countryCodes = {"ABW", 
 		"AFG", "AGO", "ALB", "AND", "ARB", "ARE", "ARG", "ARM", "ASM", "ATG", 
 		"AUS", "AUT", "AZE", "BDI", "BEL", "BEN", "BFA", "BGD", "BGR", "BHR", 
@@ -37,31 +38,31 @@ public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		"TUR", "TUV", "TZA", "UGA", "UKR", "UMC", "URY", "USA", "UZB", "VCT", 
 		"VEN", "VGB", "VIR", "VNM", "VUT", "WLD", "WSM", "XKX", "YEM", "ZAF", 
 		"ZMB", "ZWE"};
-	
+
 	public static String[] getCountryCodes(){
 		return countryCodes;
 	}
-	
+
 	private static boolean isCountryCode(String code){
 		boolean doesContain = false;
-		
+
 		for(String countryCode: getCountryCodes()){
 			if(code.equals(countryCode)){
 				doesContain = true;
 			}
 		}
-		
+
 		return doesContain;
 	}
 
 	private String cleanWord(String word){
-		
+
 		while((word.toLowerCase().charAt(0) < 97 || 
 				word.toLowerCase().charAt(0) > 122) && 
 				word.length() > 2){
 			word = word.substring(1);
 		}		
-		
+
 		while((word.toLowerCase().charAt(word.length()-1) < 97 || 
 				word.toLowerCase().charAt(word.length()-1) > 122) && 
 				word.length() > 2){
@@ -69,7 +70,7 @@ public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		}
 		return word;
 	}
-	
+
 	@Override
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
@@ -80,41 +81,76 @@ public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		 * If you are not familiar with the use of regular expressions in
 		 * Java code, search the web for "Java Regex Tutorial." 
 		 */
+
+//			for (String word : line.split("\\W+")) {
+//				if (word.length() > 0) {
+//					context.write(new Text(word), new IntWritable(1));
+//				}
+//			}
+		// Change generics to 'LongWritable, Text, Text, Text'
+		// Do not need to change parameters.
 		int wordCount = 1;
+		String countryName = "";
 		String countryCode = "";
-		boolean isFemaleEducation = false;
+		boolean isEducation = false;
+		boolean isCompleted = false;
+		String description = "";
+		int year = 1960;
 		
 		for (String word : line.split(",")) {
-			if(wordCount == 1) {
-				wordCount++;
-			}
-			else if(wordCount == 2) {
-				wordCount++;
-				if(word.length() > 3) {
-					if(word.charAt(0) == '\"') {
-						word = word.substring(1);
-					}
-					if(word.charAt(word.length()-1) == '\"') {
-						word = word.substring(0, word.length()-1);
-					}
-					countryCode = word;
+			if(word.length() > 0){
+				if(wordCount == 1) {
+					wordCount++;
+					countryName = cleanWord(word);
 				}
-			}
-			else if(wordCount == 3) {
-				wordCount++;
-				if(word.toLowerCase().contains("educational") &&
-						word.contains("female") &&
-						!word.contains("at least")){
-					isFemaleEducation = true;
-				}
-			}
-			else {			
-				if (word.length() > 0) {
-					word = cleanWord(word);
-					if(word.length() == 3){
-						context.write(new Text(word), new IntWritable(1));
+				else if(wordCount == 2) {
+					wordCount++;
+					if(word.length() >= 3) {
+						word = cleanWord(word);
+						if(isCountryCode(word)){
+							countryCode = word;
+						}
 					}
 				}
+				else if(wordCount == 3) {
+					if(word.toLowerCase().contains("educational")){
+						wordCount++;
+						isEducation = true;
+						if(word.charAt(0) == '\"'){
+							description = word.substring(1);
+						}
+						else{
+							description = word;
+						}
+					}
+				}
+				else if(wordCount == 4){
+					word = word.trim().toLowerCase();
+					if(!word.contains("no") && 
+						!word.contains("some")){
+						wordCount++;
+						isCompleted = true;
+						description = description.concat(", ").concat(word);
+						context.write(new Text(description), new IntWritable(1));
+					}
+				}
+				
+//				int last = word.length()-1;
+//				if(word.charAt(last) == '\"'){
+//					word = word.substring(0, last);
+//				}
+//					else {
+//						if(isCountryCode(word) && isFemaleEducation){
+//							word = cleanWord(word);
+//							double percentage = Double.parseDouble(word);
+//							if(percentage < 30){
+//								String passKey = countryName + " " + description;
+//								String passValue = year + " " + percentage;
+//								year++;
+//								context.write(new Text(passKey), new Text(passValue));
+//							}
+//						}
+//					}
 			}
 		}
 	}
