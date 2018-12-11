@@ -31,7 +31,8 @@ public class StatsCount {
 		job.setReducerClass(StatsReducer.class);
 
 		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(IntWritable.class);
+		job.setOutputValueClass(Text.class);
+//		job.setOutputValueClass(IntWritable.class);
 
 		boolean success = job.waitForCompletion(true);
 		System.exit(success ? 0 : 1);

@@ -2,13 +2,11 @@ package com.revature.map;
 
 import java.io.IOException;
 
-import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+public class StatsMapper extends Mapper<LongWritable, Text, Text, Text> {
 
 	private static String[] countryCodes = {"ABW", 
 		"AFG", "AGO", "ALB", "AND", "ARB", "ARE", "ARG", "ARM", "ASM", "ATG", 
@@ -55,22 +53,6 @@ public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		}
 		return doesContain;
 	}
-
-//	private String cleanWord(String word){
-//
-//		while((word.toLowerCase().charAt(0) < 97 || 
-//				word.toLowerCase().charAt(0) > 122) && 
-//				word.length() > 2){
-//			word = word.substring(1);
-//		}		
-//
-//		while((word.toLowerCase().charAt(word.length()-1) < 97 || 
-//				word.toLowerCase().charAt(word.length()-1) > 122) && 
-//				word.length() > 2){
-//			word = word.substring(0, word.length()-1);
-//		}
-//		return word;
-//	}
 	
 	private String removeQuotes(String word){
 		word = word.trim();
@@ -89,18 +71,6 @@ public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
 		String line = value.toString();
 
-		/*
-		 * If you are not familiar with the use of regular expressions in
-		 * Java code, search the web for "Java Regex Tutorial." 
-		 */
-
-//			for (String word : line.split("\\W+")) {
-//				if (word.length() > 0) {
-//					context.write(new Text(word), new IntWritable(1));
-//				}
-//			}
-		// Change generics to 'LongWritable, Text, Text, Text'
-		// Do not need to change parameters.
 		int wordCount = 1;
 		String countryName = "";
 		String countryCode = "";
@@ -149,9 +119,10 @@ public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 				}
 				else if(wordCount >= 8 && isFemale){
 					if(Double.parseDouble(word) < 30){						
-						String newKey = countryName + " " + description;
-						String newValue = year + " " + word;
-						context.write(new Text(newValue), new IntWritable(1));
+						String newKey = countryName.concat(" ").concat(description);
+						String newValue = (year + " ").concat(word);
+						context.write(new Text(newKey), new Text(newValue));
+						//part-r-00000 has max doubles of 9.999.
 					}
 				}
 				else{
