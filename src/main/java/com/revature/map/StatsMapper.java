@@ -45,27 +45,39 @@ public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 
 	private static boolean isCountryCode(String code){
 		boolean doesContain = false;
-
+		if(code.length() != 3){
+			return doesContain;
+		}
 		for(String countryCode: getCountryCodes()){
 			if(code.equals(countryCode)){
 				doesContain = true;
 			}
 		}
-
 		return doesContain;
 	}
 
-	private String cleanWord(String word){
-
-		while((word.toLowerCase().charAt(0) < 97 || 
-				word.toLowerCase().charAt(0) > 122) && 
-				word.length() > 2){
+//	private String cleanWord(String word){
+//
+//		while((word.toLowerCase().charAt(0) < 97 || 
+//				word.toLowerCase().charAt(0) > 122) && 
+//				word.length() > 2){
+//			word = word.substring(1);
+//		}		
+//
+//		while((word.toLowerCase().charAt(word.length()-1) < 97 || 
+//				word.toLowerCase().charAt(word.length()-1) > 122) && 
+//				word.length() > 2){
+//			word = word.substring(0, word.length()-1);
+//		}
+//		return word;
+//	}
+	
+	private String removeQuotes(String word){
+		word = word.trim();
+		if(word.charAt(0) == '\"'){
 			word = word.substring(1);
-		}		
-
-		while((word.toLowerCase().charAt(word.length()-1) < 97 || 
-				word.toLowerCase().charAt(word.length()-1) > 122) && 
-				word.length() > 2){
+		}
+		if(word.charAt(word.length()-1) == '\"'){
 			word = word.substring(0, word.length()-1);
 		}
 		return word;
@@ -92,65 +104,59 @@ public class StatsMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 		int wordCount = 1;
 		String countryName = "";
 		String countryCode = "";
+		boolean isCountry = false;
 		boolean isEducation = false;
 		boolean isCompleted = false;
+		boolean isFemale = false;
 		String description = "";
 		int year = 1960;
 		
 		for (String word : line.split(",")) {
+			word = removeQuotes(word);
 			if(word.length() > 0){
 				if(wordCount == 1) {
 					wordCount++;
-					countryName = cleanWord(word);
+					countryName = word;
 				}
 				else if(wordCount == 2) {
 					wordCount++;
-					if(word.length() >= 3) {
-						word = cleanWord(word);
-						if(isCountryCode(word)){
-							countryCode = word;
-						}
+					if(isCountryCode(word)){
+						isCountry = true;
+						countryCode = word;
 					}
 				}
-				else if(wordCount == 3) {
+				else if(wordCount == 3 && isCountry) {
 					if(word.toLowerCase().contains("educational")){
 						wordCount++;
 						isEducation = true;
-						if(word.charAt(0) == '\"'){
-							description = word.substring(1);
-						}
-						else{
-							description = word;
-						}
+						description = word;
 					}
 				}
-				else if(wordCount == 4){
-					word = word.trim().toLowerCase();
-					if(!word.contains("no") && 
-						!word.contains("some")){
+				else if(wordCount == 4 && isEducation){
+					if(!word.toLowerCase().contains("no") && 
+						!word.toLowerCase().contains("some")){
 						wordCount++;
 						isCompleted = true;
 						description = description.concat(", ").concat(word);
-						context.write(new Text(description), new IntWritable(1));
 					}
 				}
-				
-//				int last = word.length()-1;
-//				if(word.charAt(last) == '\"'){
-//					word = word.substring(0, last);
-//				}
-//					else {
-//						if(isCountryCode(word) && isFemaleEducation){
-//							word = cleanWord(word);
-//							double percentage = Double.parseDouble(word);
-//							if(percentage < 30){
-//								String passKey = countryName + " " + description;
-//								String passValue = year + " " + percentage;
-//								year++;
-//								context.write(new Text(passKey), new Text(passValue));
-//							}
-//						}
-//					}
+				else if(wordCount == 6 && isCompleted){
+					if(word.toLowerCase().contains("female")){
+						wordCount++;
+						isFemale = true;
+						description = description.concat(", ").concat("female");
+					}
+				}
+				else if(wordCount >= 8 && isFemale){
+					if(Double.parseDouble(word) < 30){						
+						String newKey = countryName + " " + description;
+						String newValue = year + " " + word;
+						context.write(new Text(newValue), new IntWritable(1));
+					}
+				}
+				else{
+					wordCount++;
+				}
 			}
 		}
 	}
