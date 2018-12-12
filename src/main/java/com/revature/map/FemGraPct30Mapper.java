@@ -76,50 +76,28 @@ public class FemGraPct30Mapper extends Mapper<LongWritable, Text, Text, Text> {
 		return doesContain;
 	}
 	
-//	private String removeQuotes(String word){
-//		word = word.trim();
-//		if(word.charAt(0) == '\"'){
-//			word = word.substring(1);
-//		}
-//		if(word.charAt(word.length()-1) == '\"'){
-//			word = word.substring(0, word.length()-1);
-//		}
-//		return word;
-//	}
-
 	@Override
 	public void map(LongWritable key, Text value, Context context)
 			throws IOException, InterruptedException {
-
-		String line = value.toString();
-
-		String countryName = "";
-		String countryCode = "";
-		boolean isCountry = false;
-		String description = "";
-		String descriptionCode = "";
-		boolean isdescriptionCode = false;
 				
-		String[] data = line.split("\".\"");
+		String[] data = value.toString().split("\".\"");
 		
 		if(isCountryCode(data[1]) && isDescriptionCode(data[3])){
-			countryName = data[0].substring(1);
-			countryCode = data[1];
-			description = data[2];
-			descriptionCode = data[3];
+			String countryName = data[0].substring(1);
+			String description = data[2].trim();
 			
 			for(int index = 4; index < data.length; index++){
 				if(!data[index].isEmpty()){
 					try{
 						double percent = Double.parseDouble(data[index]);
 						if(percent < 30){
-							String outputKey = countryName.concat(" ")
+							String outputKey = countryName.concat(": ")
 														  .concat(description);
-							String outputValue = ("(").concat(fileHeaders[index])
-													  .concat(", ")
-													  .concat(data[index])
-													  .concat(")");
-							context.write(new Text(outputKey), new Text(outputValue));
+							String outputValue = fileHeaders[index]
+												  .concat(", ")
+												  .concat(data[index]);
+							context.write(new Text(outputKey.trim()), 
+									new Text(outputValue.trim()));
 						}
 					} catch (NumberFormatException e){
 					}
