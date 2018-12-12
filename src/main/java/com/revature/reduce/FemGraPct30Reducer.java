@@ -1,7 +1,6 @@
 package com.revature.reduce;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -26,7 +25,7 @@ public class FemGraPct30Reducer extends Reducer<Text, Text, Text, Text>{
 	public void reduce(Text key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
 		
-		TreeMap treeMap = new TreeMap();
+		TreeMap<Integer, Double> treeMap = new TreeMap<Integer, Double>();
 		
 		for(Text value : values) {
 			String yearValue = value.toString();
