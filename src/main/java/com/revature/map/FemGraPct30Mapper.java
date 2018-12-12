@@ -36,17 +36,29 @@ public class FemGraPct30Mapper extends Mapper<LongWritable, Text, Text, Text> {
 		"TUR", "TUV", "TZA", "UGA", "UKR", "UMC", "URY", "USA", "UZB", "VCT", 
 		"VEN", "VGB", "VIR", "VNM", "VUT", "WLD", "WSM", "XKX", "YEM", "ZAF", 
 		"ZMB", "ZWE"};
-
-	public static String[] getCountryCodes(){
-		return countryCodes;
-	}
+	
+	private static String[] descriptionCodes = {"SE.TER.CUAT.BA.FE.ZS", 
+		"SE.SEC.CUAT.LO.FE.ZS", "SE.SEC.CUAT.PO.FE.ZS", "SE.PRM.CUAT.FE.ZS",
+		"SE.TER.CUAT.ST.FE.ZS", "SE.SEC.CUAT.UP.FE.ZS", "SE.TER.CUAT.MS.FE.ZS",
+		"SE.TER.HIAT.BA.FE.ZS", "SE.TER.HIAT.DO.FE.ZS", "SE.SEC.HIAT.LO.FE.ZS",
+		"SE.TER.HIAT.MS.FE.ZS", "SE.SEC.HIAT.PO.FE.ZS", "SE.PRM.HIAT.FE.ZS",
+		"SE.TER.HIAT.ST.FE.ZS", "SE.SEC.HIAT.UP.FE.ZS", "SE.TER.CUAT.DO.FE.ZS"};
+	
+	private static String[] fileHeaders = {"Country Name","Country Code",
+		"Indicator Name","Indicator Code","1960","1961","1962","1963","1964",
+		"1965","1966","1967","1968","1969","1970","1971","1972","1973","1974",
+		"1975","1976","1977","1978","1979","1980","1981","1982","1983","1984",
+		"1985","1986","1987","1988","1989","1990","1991","1992","1993","1994",
+		"1995","1996","1997","1998","1999","2000","2001","2002","2003","2004",
+		"2005","2006","2007","2008","2009","2010","2011","2012","2013","2014",
+		"2015","2016"};
 
 	private static boolean isCountryCode(String code){
 		boolean doesContain = false;
 		if(code.length() != 3){
 			return doesContain;
 		}
-		for(String countryCode: getCountryCodes()){
+		for(String countryCode: countryCodes){
 			if(code.equals(countryCode)){
 				doesContain = true;
 			}
@@ -54,16 +66,26 @@ public class FemGraPct30Mapper extends Mapper<LongWritable, Text, Text, Text> {
 		return doesContain;
 	}
 	
-	private String removeQuotes(String word){
-		word = word.trim();
-		if(word.charAt(0) == '\"'){
-			word = word.substring(1);
+	private static boolean isDescriptionCode(String code){
+		boolean doesContain = false;
+		for(String descriptionCode: descriptionCodes){
+			if(code.equals(descriptionCode)){
+				doesContain = true;
+			}
 		}
-		if(word.charAt(word.length()-1) == '\"'){
-			word = word.substring(0, word.length()-1);
-		}
-		return word;
+		return doesContain;
 	}
+	
+//	private String removeQuotes(String word){
+//		word = word.trim();
+//		if(word.charAt(0) == '\"'){
+//			word = word.substring(1);
+//		}
+//		if(word.charAt(word.length()-1) == '\"'){
+//			word = word.substring(0, word.length()-1);
+//		}
+//		return word;
+//	}
 
 	@Override
 	public void map(LongWritable key, Text value, Context context)
@@ -71,68 +93,37 @@ public class FemGraPct30Mapper extends Mapper<LongWritable, Text, Text, Text> {
 
 		String line = value.toString();
 
-		int wordCount = 1;
 		String countryName = "";
-//		String countryCode = "";
+		String countryCode = "";
 		boolean isCountry = false;
-		boolean isEducation = false;
-		boolean isCompleted = false;
-		boolean isFemale = false;
 		String description = "";
-		int year = 1959;
+		String descriptionCode = "";
+		boolean isdescriptionCode = false;
+				
+		String[] data = line.split("\".\"");
 		
-		for (String word : line.split(",")) {
-			word = removeQuotes(word);
-			if(word.length() > 0){
-				if(wordCount == 1) {
-					wordCount++;
-					countryName = word;
-				}
-				else if(wordCount == 2) {
-					wordCount++;
-					if(isCountryCode(word)){
-						isCountry = true;
-//						countryCode = word;
-					}
-				}
-				else if(wordCount == 3 && isCountry) {
-					if(word.toLowerCase().contains("educational")){
-						wordCount++;
-						isEducation = true;
-						description = word;
-					}
-				}
-				else if(wordCount == 4 && isEducation){
-					if(!word.toLowerCase().contains("no") && 
-						!word.toLowerCase().contains("some")){
-						wordCount++;
-						isCompleted = true;
-						description = description.concat(", ").concat(word);
-					}
-				}
-				else if(wordCount == 6 && isCompleted){
-					if(word.toLowerCase().contains("female")){
-						wordCount++;
-						isFemale = true;
-						description = description.concat(", ").concat("female");
-					}
-				}
-				else if(wordCount >= 8 && isFemale){
-					year++;
-					if(isFemale){
-						if(Double.parseDouble(word) < 30){						
-							String newKey = countryName.concat(" ").concat(description);
-							String newValue = ("(" + year + ", ").concat(word).concat(")");
-							context.write(new Text(newKey), new Text(newValue));
+		if(isCountryCode(data[1]) && isDescriptionCode(data[3])){
+			countryName = data[0].substring(1);
+			countryCode = data[1];
+			description = data[2];
+			descriptionCode = data[3];
+			
+			for(int index = 4; index < data.length; index++){
+				if(!data[index].isEmpty()){
+					try{
+						double percent = Double.parseDouble(data[index]);
+						if(percent < 30){
+							String outputKey = countryName.concat(" ")
+														  .concat(description);
+							String outputValue = ("(").concat(fileHeaders[index])
+													  .concat(", ")
+													  .concat(data[index])
+													  .concat(")");
+							context.write(new Text(outputKey), new Text(outputValue));
 						}
+					} catch (NumberFormatException e){
 					}
 				}
-				else{
-					wordCount++;
-				}
-			}
-			else if(wordCount >= 8){
-				year++;
 			}
 		}
 	}

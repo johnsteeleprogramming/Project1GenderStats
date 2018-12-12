@@ -12,12 +12,10 @@ public class FemEduAvrIncReducer extends Reducer<Text, Text, Text, Text>{
 			throws IOException, InterruptedException {
 		
 		String results = "";
-		// TODO (year, double) are not printing in numerical order.
-		// Come back and organize this if time.
-		// Consider create (year, double) class with sortby override.
+
 		for (Text value : values) {
-			results = results.concat("  ").concat(value.toString());
+			results = results.concat(value.toString()).concat("  ");
 		}
-		context.write(key, new Text(results));
+		context.write(key, new Text(results.trim()));
 	}
 }
