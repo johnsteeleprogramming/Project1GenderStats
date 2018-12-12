@@ -16,8 +16,8 @@ public class FemGraPct30Reducer extends Reducer<Text, Text, Text, Text>{
 		// Come back and organize this if time.
 		// Consider create (year, double) class with sortby override.
 		for (Text value : values) {
-			results = results.concat("  ").concat(value.toString());
+			results = results.concat(value.toString()).concat("  ");
 		}
-		context.write(key, new Text(results));
+		context.write(key, new Text(results.trim()));
 	}
 }

@@ -21,7 +21,7 @@ public class FemEduAvrInc {
 		Job job = new Job();
 
 		job.setJarByClass(FemEduAvrInc.class);
-		job.setJobName("Gender Stats");
+		job.setJobName("Average increase in female education since 2000");
 
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));

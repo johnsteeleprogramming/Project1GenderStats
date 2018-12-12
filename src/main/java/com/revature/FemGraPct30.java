@@ -21,7 +21,7 @@ public class FemGraPct30 {
 		Job job = new Job();
 
 		job.setJarByClass(FemGraPct30.class);
-		job.setJobName("Gender Stats");
+		job.setJobName("Female Graduation Rates less than 30%");
 
 		FileInputFormat.setInputPaths(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
