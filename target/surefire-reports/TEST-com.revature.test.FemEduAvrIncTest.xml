@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="3" failures="0" name="com.revature.test.FemGraPct30Test" time="0.618" errors="0" skipped="0">
+<testsuite tests="3" failures="0" name="com.revature.test.FemEduAvrIncTest" time="0.088" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/java/jdk1.8.0_172/jre/lib/amd64"/>
@@ -60,7 +60,7 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase classname="com.revature.test.FemGraPct30Test" name="testReducer" time="0.528"/>
-  <testcase classname="com.revature.test.FemGraPct30Test" name="testMapper" time="0.052"/>
-  <testcase classname="com.revature.test.FemGraPct30Test" name="testMapReduce" time="0.038"/>
+  <testcase classname="com.revature.test.FemEduAvrIncTest" name="testReducer" time="0.025"/>
+  <testcase classname="com.revature.test.FemEduAvrIncTest" name="testMapper" time="0.037"/>
+  <testcase classname="com.revature.test.FemEduAvrIncTest" name="testMapReduce" time="0.026"/>
 </testsuite>

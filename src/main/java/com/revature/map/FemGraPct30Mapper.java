@@ -100,6 +100,7 @@ public class FemGraPct30Mapper extends Mapper<LongWritable, Text, Text, Text> {
 									new Text(outputValue.trim()));
 						}
 					} catch (NumberFormatException e){
+						// TODO Put in logger if have time.
 					}
 				}
 			}
