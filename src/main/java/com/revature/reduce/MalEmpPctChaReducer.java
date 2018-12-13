@@ -45,8 +45,7 @@ public class MalEmpPctChaReducer extends Reducer<Text, Text, Text, Text>{
 					double currentPercent = entry.getValue();
 
 					String yearDisplay = prevYear + "-" + currentYear;
-					double change 
-						= currentPercent-prevPercent;
+					double change = currentPercent-prevPercent;
 
 					treeMapAvrInc.put(yearDisplay, decimalFormat.format(change));
 					
