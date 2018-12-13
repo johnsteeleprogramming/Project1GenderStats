@@ -8,35 +8,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 public class FemEduAvrIncMapper extends Mapper<LongWritable, Text, Text, Text> {
 	
-	private static String[] countryCodes = {"ABW", 
-		"AFG", "AGO", "ALB", "AND", "ARB", "ARE", "ARG", "ARM", "ASM", "ATG", 
-		"AUS", "AUT", "AZE", "BDI", "BEL", "BEN", "BFA", "BGD", "BGR", "BHR", 
-		"BHS", "BIH", "BLR", "BLZ", "BMU", "BOL", "BRA", "BRB", "BRN", "BTN", 
-		"BWA", "CAF", "CAN", "CEB", "CHE", "CHI", "CHL", "CHN", "CIV", "CMR", 
-		"COD", "COG", "COL", "COM", "CPV", "CRI", "CSS", "CUB", "CUW", "CYM", 
-		"CYP", "CZE", "DEU", "DJI", "DMA", "DNK", "DOM", "DZA", "EAP", "EAR", 
-		"EAS", "ECA", "ECS", "ECU", "EGY", "EMU", "ERI", "ESP", "EST", "ETH", 
-		"EUU", "FCS", "FIN", "FJI", "FRA", "FRO", "FSM", "GAB", "GBR", "GEO", 
-		"GHA", "GIB", "GIN", "GMB", "GNB", "GNQ", "GRC", "GRD", "GRL", "GTM", 
-		"GUM", "GUY", "HIC", "HKG", "HND", "HPC", "HRV", "HTI", "HUN", "IBD", 
-		"IBT", "IDA", "IDB", "IDN", "IDX", "IMN", "IND", "IRL", "IRN", "IRQ", 
-		"ISL", "ISR", "ITA", "JAM", "JOR", "JPN", "KAZ", "KEN", "KGZ", "KHM", 
-		"KIR", "KNA", "KOR", "KWT", "LAC", "LAO", "LBN", "LBR", "LBY", "LCA", 
-		"LCN", "LDC", "LIC", "LIE", "LKA", "LMC", "LMY", "LSO", "LTE", "LTU", 
-		"LUX", "LVA", "MAC", "MAF", "MAR", "MCO", "MDA", "MDG", "MDV", "MEA", 
-		"MEX", "MHL", "MIC", "MKD", "MLI", "MLT", "MMR", "MNA", "MNE", "MNG", 
-		"MNP", "MOZ", "MRT", "MUS", "MWI", "MYS", "NAC", "NAM", "NCL", "NER", 
-		"NGA", "NIC", "NLD", "NOR", "NPL", "NRU", "NZL", "OED", "OMN", "OSS", 
-		"PAK", "PAN", "PER", "PHL", "PLW", "PNG", "POL", "PRE", "PRI", "PRK", 
-		"PRT", "PRY", "PSE", "PSS", "PST", "PYF", "QAT", "ROU", "RUS", "RWA", 
-		"SAS", "SAU", "SDN", "SEN", "SGP", "SLB", "SLE", "SLV", "SMR", "SOM", 
-		"SRB", "SSA", "SSD", "SSF", "SST", "STP", "SUR", "SVK", "SVN", "SWE", 
-		"SWZ", "SXM", "SYC", "SYR", "TCA", "TCD", "TEA", "TEC", "TGO", "THA", 
-		"TJK", "TKM", "TLA", "TLS", "TMN", "TON", "TSA", "TSS", "TTO", "TUN", 
-		"TUR", "TUV", "TZA", "UGA", "UKR", "UMC", "URY", "USA", "UZB", "VCT", 
-		"VEN", "VGB", "VIR", "VNM", "VUT", "WLD", "WSM", "XKX", "YEM", "ZAF", 
-		"ZMB", "ZWE"};
-	
 	private static String[] descriptionCodes = {"SE.TER.CUAT.BA.FE.ZS", 
 		"SE.SEC.CUAT.LO.FE.ZS", "SE.SEC.CUAT.PO.FE.ZS", "SE.PRM.CUAT.FE.ZS",
 		"SE.TER.CUAT.ST.FE.ZS", "SE.SEC.CUAT.UP.FE.ZS", "SE.TER.CUAT.MS.FE.ZS",
@@ -77,11 +48,12 @@ public class FemEduAvrIncMapper extends Mapper<LongWritable, Text, Text, Text> {
 			String countryName = data[0].substring(1);
 			String description = data[2].trim();
 			
-			for(int index = 4; index < data.length; index++){
+			for(int index = 44; index < data.length; index++){
 				if(!data[index].isEmpty()){
 					try{
+						// Keep check in here to make sure value is a number.
 						double percent = Double.parseDouble(data[index]);
-						if(percent < 30){
+						if(percent >= 0){
 							String outputKey = countryName.concat(": ")
 														  .concat(description);
 							String outputValue = fileHeaders[index]
