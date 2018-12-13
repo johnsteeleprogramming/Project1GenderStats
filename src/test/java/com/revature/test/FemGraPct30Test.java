@@ -39,61 +39,85 @@ public class FemGraPct30Test {
 	@Test
 	public void testMapper() {
 		
-//		String inputTest = "\"France\",\"FRA\",\"Educational attainment, "
-//				+ "completed lower secondary, population 25+ years, female "
-//				+ "(%)\",\"SE.SEC.HIAT.LO.FE.ZS\",\"\",\"\",\"\",\"\",\"\",\""
-//				+ "\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\""
-//				+ ",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\""
-//				+ ",\"\",\"34.18065\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\""
-//				+ "\",\"\",\"\",\"\",\"\",\"18.72376\",\"\"";
-//		mapDriver.withInput(new LongWritable(1), new Text(inputTest));
-//
-//		String outputKeyTest = "France Educational attainment, "
-//				+ "completed lower secondary, female";
-//		String outputValueTest = "(2004, 18.72376)";
-//		mapDriver.withOutput(new Text(outputKeyTest), new Text(outputValueTest));
-//		
-//		mapDriver.runTest();
+		String inputTest = "\"United States\",\"USA\",\"Educational attainment, "
+				+ "completed Bachelor's or equivalent, population 25+ years, "
+				+ "female (%)\",\"SE.TER.HIAT.BA.FE.ZS\",\"14.8\",\"\",\"\",\"\","
+				+ "\"\",\"\",\"\",\"\",\"\",\"\",\"18.7\",\"\",\"\",\"\",\"\",\""
+				+ "22.2\",\"\",\"\",\"\",\"26.9\",\"28.10064\",\"28.02803\",\"\",\""
+				+ "\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"44.54951\""
+				+ ",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"35.37453\",\""
+				+ "36.00504\",\"37.52263\",\"\",\"38.44067\",\"39.15297\",\"39.89922\""
+				+ ",\"40.53132\",\"41.12231\",\"20.18248\",\"20.38445\",\"20.68499\""
+				+ ",\"\",";
+		mapDriver.withInput(new LongWritable(1), new Text(inputTest));
+
+		String outputKeyTest = "United States: Educational attainment, "
+				+ "completed Bachelor's or equivalent, population 25+ years, "
+				+ "female (%)";
+		String[] outputValueTest = {"1960, 14.8", "1970, 18.7", "1975, 22.2",
+				"1979, 26.9", "1980, 28.10064", "1981, 28.02803", 
+				"2013, 20.18248", "2014, 20.38445", "2015, 20.68499"};
+
+		for(int index = 0; index < outputValueTest.length; index++){
+			mapDriver.withOutput(new Text(outputKeyTest), 
+					new Text(outputValueTest[index]));
+		}
+		
+		mapDriver.runTest();
 	}
 
 	@Test
 	public void testReducer() {
+		String inputKeyTest = "United States: Educational attainment, "
+				+ "completed Bachelor's or equivalent, population 25+ years, "
+				+ "female (%)";
 
-//		String key = "France Educational attainment, "
-//				+ "completed lower secondary, female";
-//
-//		List<Text> values = new ArrayList<Text>();
-//		String value1 = "(2004, 18.72376)";
-//		String value2 = "(2005, 19.54324)";
-//		values.add(new Text(value1));
-//		values.add(new Text(value2));
-//		String expectedOutput = value1.concat("  ").concat(value2);
-//		
-//		reduceDriver.withInput(new Text(key), values);
-//
-//		reduceDriver.withOutput(new Text(key), new Text(expectedOutput));
-//
-//		reduceDriver.runTest();
+		List<Text> values = new ArrayList<Text>();
+
+		String[] inputValueTest = {"1960, 14.8", "1970, 18.7", "1975, 22.2",
+				"1979, 26.9", "1980, 28.10064", "1981, 28.02803", 
+				"2013, 20.18248", "2014, 20.38445", "2015, 20.68499"};
+
+		String expectedOutput = "";
+		for(int index = 0; index < inputValueTest.length; index++){
+			values.add(new Text(inputValueTest[index]));
+			expectedOutput = expectedOutput.concat("(").concat(inputValueTest[index])
+					.concat(") ");
+		}
+		expectedOutput = expectedOutput.trim();
+		
+		reduceDriver.withInput(new Text(inputKeyTest), values);
+
+		reduceDriver.withOutput(new Text(inputKeyTest), new Text(expectedOutput));
+
+		reduceDriver.runTest();
 	}
 
 	@Test
 	public void testMapReduce() {
 
-//		String inputTest = "\"France\",\"FRA\",\"Educational attainment, "
-//				+ "completed lower secondary, population 25+ years, female "
-//				+ "(%)\",\"SE.SEC.HIAT.LO.FE.ZS\",\"\",\"\",\"\",\"\",\"\",\""
-//				+ "\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\""
-//				+ ",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\""
-//				+ ",\"\",\"34.18065\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\""
-//				+ "\",\"\",\"\",\"\",\"\",\"18.72376\",\"\"";
-//		String outputKey = "France Educational attainment, "
-//				+ "completed lower secondary, female";
-//		String outputValue = "(2004, 18.72376)";
-//
-//		mapReduceDriver.withInput(new LongWritable(1), new Text(inputTest));
-//
-//		mapReduceDriver.addOutput(new Text(outputKey), new Text(outputValue));
-//
-//		mapReduceDriver.runTest();
+		String inputTest = "\"United States\",\"USA\",\"Educational attainment, "
+				+ "completed Bachelor's or equivalent, population 25+ years, "
+				+ "female (%)\",\"SE.TER.HIAT.BA.FE.ZS\",\"14.8\",\"\",\"\",\"\","
+				+ "\"\",\"\",\"\",\"\",\"\",\"\",\"18.7\",\"\",\"\",\"\",\"\",\""
+				+ "22.2\",\"\",\"\",\"\",\"26.9\",\"28.10064\",\"28.02803\",\"\",\""
+				+ "\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"44.54951\""
+				+ ",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"35.37453\",\""
+				+ "36.00504\",\"37.52263\",\"\",\"38.44067\",\"39.15297\",\"39.89922\""
+				+ ",\"40.53132\",\"41.12231\",\"20.18248\",\"20.38445\",\"20.68499\""
+				+ ",\"\",";
+		
+		String outputKeyTest = "United States: Educational attainment, "
+				+ "completed Bachelor's or equivalent, population 25+ years, "
+				+ "female (%)";
+		String outputValueTest = "(1960, 14.8) (1970, 18.7) (1975, 22.2) "
+				+ "(1979, 26.9) (1980, 28.10064) (1981, 28.02803) "
+				+ "(2013, 20.18248) (2014, 20.38445) (2015, 20.68499)";
+
+		mapReduceDriver.withInput(new LongWritable(1), new Text(inputTest));
+
+		mapReduceDriver.addOutput(new Text(outputKeyTest), new Text(outputValueTest));
+
+		mapReduceDriver.runTest();
 	}
 }
