@@ -20,7 +20,7 @@ public class FemGraPct30Reducer extends Reducer<Text, Text, Text, Text>{
 		}
 		return mapPrint.trim();
 	}
-	
+		
 	@Override
 	public void reduce(Text key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {

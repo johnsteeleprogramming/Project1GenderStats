@@ -1,3 +1,20 @@
+/**
+ * Author:  William John Steele
+ * Project: List the % of change in female employment from the year 2000.
+ * Process: The mapper will find the correct categories, pulling data only from 
+ * 			countries to keep consistent with other questions, so it excludes 
+ * 			the country groups.  It lists the keys as (country, category) and 
+ * 			values as (year, percent).
+ * 			The reducer will then group based off keys.  The key stays as 
+ * 			(country, category) and the value will be a string of pairs of 
+ * 			(year, percent).
+ * 			It also includes a pair ("Percent of change from 2000-2016",
+ * 			cumulative percent change)
+ * 			Based on the wording of the question, I did not put all categories 
+ * 			together in order to show more detail but I included cumulative.
+ * 
+ */
+
 package com.revature;
 
 import org.apache.hadoop.fs.Path;

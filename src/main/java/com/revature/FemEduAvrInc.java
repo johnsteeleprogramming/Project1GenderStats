@@ -1,3 +1,18 @@
+/**
+ * Author:  William John Steele
+ * Project: List the average increase in female education 
+ * 			in the US from the year 2000.
+ * Process: The mapper will find the correct categories, only from USA,
+ * 			and list key as ("United States", category) and the values as
+ * 			(year, percent).
+ * 			The reducer will then group based off keys.  The value will be
+ * 			a string of pairs of (year, percent).
+ * 			It also includes a pair ("Average Increase per year", average
+ * 			change)
+ * 			This program kept categories separate to show details.
+ * 
+ */
+
 package com.revature;
 
 import org.apache.hadoop.fs.Path;

@@ -1,3 +1,17 @@
+/**
+ * Author:  William John Steele
+ * Project: Identify the countries where % of female graduates is less than 30%.
+ * Process: The mapper finds the correct categories and outputs the key as 
+ * 			(country, category) and the value is (year, percent).  It only 
+ * 			outputs percents less than 30%.
+ * 			The reducer groups based on country and category.  It then outputs 
+ * 			the key as (country, category) and the value as a string of pairs 
+ * 			each of which is (year, percent).
+ * 			This program separates based on country and category and does not
+ * 			group together based how the question was worded.
+ * 
+ */
+
 package com.revature;
 
 import org.apache.hadoop.fs.Path;

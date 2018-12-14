@@ -1,3 +1,20 @@
+/**
+ * Author:  William John Steele
+ * Project: I choose this so it can be used as a comparison with the 
+ * 			female equivalent question in order to help analyze the overall
+ * 			question: identifying the gender factor in higher education.
+ * 			List the average increase in male education in the US from the 
+ * 			year 2000.  
+ * Process: The mapper will find the correct categories, only from USA and only 
+ * 			male, and list key as ("United States", category) and the values as
+ * 			(year, percent).
+ * 			The reducer will then group based off keys.  The value will be a 
+ * 			string of pairs of (year, percent) and is the increase from year
+ * 			to year.  Also included is ("Average Increase Per Year", average 
+ * 			increase). This program kept categories separate to show details.
+ * 
+ */
+
 package com.revature;
 
 import org.apache.hadoop.fs.Path;

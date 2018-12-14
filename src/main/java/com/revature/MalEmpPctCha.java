@@ -1,3 +1,16 @@
+/**
+ * Author:  William John Steele
+ * Project:	The percent of change in male employment from the year 2000.
+ * Process: The mapper will find the correct categories, only after 2000, and 
+ * 			list key as (country, category) and the values as (year, percent).
+ * 			The reducer will then group based off keys.  The value will be
+ * 			a string of pairs of (year, percent).
+ * 			It also includes pair ("Percent of change from 2000-2016", percent).
+ * 			Based off the wording of the question, this program kept categories 
+ * 			separate to show details and also showed cumulative at end.
+ * 
+ */
+
 package com.revature;
 
 import org.apache.hadoop.fs.Path;
