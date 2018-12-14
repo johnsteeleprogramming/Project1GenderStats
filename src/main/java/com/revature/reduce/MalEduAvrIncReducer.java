@@ -8,7 +8,7 @@ import java.util.TreeMap;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class FemEduAvrIncReducer extends Reducer<Text, Text, Text, Text> {
+public class MalEduAvrIncReducer extends Reducer<Text, Text, Text, Text> {
 
 	public static String treeMapToString(TreeMap<String, String> tm){
 		String mapPrint = "";
